@@ -1,0 +1,25 @@
+{
+  "name": "mdic-cowork",
+  "owner": {
+    "name": "jad Dimachkieh"
+  },
+  "metadata": {
+    "description": "Telecom KPI dashboards — Monthly KPIs, Actual vs Budget (GHS), and Financials (GHS & USD). Generates self-contained HTML artifacts.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "mdic-cowork",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/jaddimachkieh/mdic-cowork.git",
+        "path": "mdic-cowork"
+      },
+      "description": "Telecom KPI dashboards: Monthly KPIs, Actual vs Budget (GHS), and Financials (GHS & USD). Generates self-contained HTML artifacts from embedded Apr–Nov 2025 data.",
+      "version": "1.0.0",
+      "author": {
+        "name": "jad Dimachkieh"
+      }
+    }
+  ]
+}
