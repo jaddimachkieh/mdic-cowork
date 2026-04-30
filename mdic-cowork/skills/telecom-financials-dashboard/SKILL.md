@@ -9,7 +9,7 @@ description: Use when asked to create, generate, or build the Financials telecom
 User asks to generate the Financials dashboard, the GHS/USD page, or Dashboard 3.
 
 ## Step 1 — Read CSV Files
-Read the following files from the current working directory:
+Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test/data):
 
 | File | Purpose |
 |---|---|

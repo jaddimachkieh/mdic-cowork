@@ -9,7 +9,7 @@ description: Use when asked to create, generate, or build the Actual vs Budget t
 User asks to generate the Actual vs Budget dashboard, the budget comparison page, or Dashboard 2.
 
 ## Step 1 — Read CSV Files
-Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test):
+Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test/data):
 
 | File | Purpose |
 |---|---|

@@ -9,7 +9,7 @@ description: Use when asked to create, generate, or build the Monthly KPIs telec
 User asks to generate the Monthly KPIs dashboard, the KPI page, or Dashboard 1.
 
 ## Step 1 — Read CSV Files
-Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test):
+Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test/data):
 
 | File | Purpose |
 |---|---|
