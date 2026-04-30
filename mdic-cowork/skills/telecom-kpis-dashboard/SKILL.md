@@ -1,6 +1,6 @@
 ---
 name: telecom-kpis-dashboard
-description: Use when asked to create, generate, or build the Monthly KPIs telecom dashboard artifact. Generates a self-contained HTML artifact with financials cards, subscriber KPIs, revenue breakdown donut chart, and inflows/outflows for November 2025.
+description: Use when asked to create, generate, or build the Monthly KPIs telecom dashboard artifact. Reads CSV files from the working folder's data/ directory and generates a self-contained HTML artifact with financials cards, subscriber KPIs, revenue breakdown donut, and inflows/outflows.
 ---
 
 # Telecom — Monthly KPIs Dashboard
@@ -8,9 +8,28 @@ description: Use when asked to create, generate, or build the Monthly KPIs telec
 ## Trigger
 User asks to generate the Monthly KPIs dashboard, the KPI page, or Dashboard 1.
 
-## Output
-Generate a **single self-contained HTML artifact** using Chart.js loaded from CDN.
-All data is embedded — no external files needed.
+## Step 1 — Read CSV Files
+Read the following files from the current working directory (/Users/jaddimachkieh/Documents/mdic_test):
+
+| File | Purpose |
+|---|---|
+| `monthly_financials.csv` | KPI cards, CAPEX, profit/loss, network availability, inflows/outflows |
+| `subscribers_monthly.csv` | Subscriber KPI cards |
+| `nov_revenue_breakdown_pie.csv` | Revenue donut chart |
+
+**`monthly_financials.csv` key columns:**
+`Month`, `Revenue_Actual_M`, `OPEX_Actual_M`, `Gross_Margin_Pct`, `OPEX_Intensity_Pct`, `EBITDA_Pct`, `CAPEX_M`, `CAPEX_Intensity_Pct`, `Profit_Loss_M`, `Network_Availability_Pct`, `Inflows`, `Outflows`
+
+**`subscribers_monthly.csv` key columns:**
+`Month`, `Total_Subs_000`, `Gross_Adds_000`, `Active_Data_Subs_000`, `Mobile_RGS_000`, `Active_Cash_Subs_000`, `Cash_RGS_000`, `Fixed_RGS_000`, `Churn_Pct`
+
+**`nov_revenue_breakdown_pie.csv` key columns:**
+`Category`, `Pct`, `Amount_M`
+
+Parse all CSVs, embed the data as JS arrays in the artifact, and default to the **latest month** in the data.
+
+## Step 2 — Generate HTML Artifact
+Generate a **single self-contained HTML artifact** using Chart.js (CDN) with all parsed data embedded inline.
 
 ---
 
@@ -34,110 +53,58 @@ border:         #3a3a55
 
 ### TOP BAR
 - Left: bold white "Monthly KPIs" + small white rectangle accent
-- Center: pill-button month tabs Jan–Dec, **November active** (dark crimson background)
-- Right: "2024 / ● 2025" radio selector (2025 selected with red dot)
+- Center: pill-button month tabs — one per month found in the CSV, latest month active
+- Right: year selector driven by years present in the data
 
 ### ROW 1 — Three panels side by side
 
 **LEFT — "Financials (GHS)"** (dark maroon header strip)
-2×4 grid of KPI cards:
+2×4 grid of KPI cards — populated from selected month's CSV row:
 ```
-| Revenue        | OPEX           |
-| 251.04M        | 136.21M        |
-|----------------|----------------|
-| Gross Margin   | OPEX Intensity |
-| 75%            | 54%            |
-|----------------|----------------|
-| EBITDA %       | CAPEX          |
-| 21%            | 242.12M  🔴    |
-|----------------|----------------|
-| Profit/(Loss)  | CAPEX Intensity|
-| -97.52M        | 21%      🔴    |
+| Revenue_Actual_M     | OPEX_Actual_M        |
+| Gross_Margin_Pct %   | OPEX_Intensity_Pct % |
+| EBITDA_Pct %         | CAPEX_M          🔴  |
+| Profit_Loss_M        | CAPEX_Intensity_Pct 🔴|
 ```
-🔴 = render in #ff3b5c (over-budget red)
+🔴 = render in #ff3b5c (CAPEX values are over-budget, always highlight red)
 
 **CENTER** — two stacked cards
-- Top card: label "FTEs", value "(BL..." in gray/blurred style
-- Bottom card: label "Network Availability", large value **99.01%**
+- Top: label "FTEs", value shown as "(BL..." in gray/blurred style
+- Bottom: label "Network Availability", value from `Network_Availability_Pct`
 
 **RIGHT — "Subscribers (000)"** (dark maroon header strip)
-2×4 grid of KPI cards:
+2×4 grid — populated from selected month's subscribers CSV row:
 ```
-| Total Subs     | Gross Adds     |
-| 8,503          | 284            |
-|----------------|----------------|
-| Active Data    | Mobile RGS     |
-| 2,732          | 4,145          |
-|----------------|----------------|
-| Active Cash    | Cash RGS       |
-| 2,950          | 2,489          |
-|----------------|----------------|
-| Fixed RGS      | Churn          |
-| 63.9           | -1.50%         |
+| Total_Subs_000       | Gross_Adds_000       |
+| Active_Data_Subs_000 | Mobile_RGS_000       |
+| Active_Cash_Subs_000 | Cash_RGS_000         |
+| Fixed_RGS_000        | Churn_Pct %          |
 ```
 
 ### ROW 2 — Two panels side by side
 
 **LEFT — "Revenue Breakdown"** — Donut chart (cutout 70%)
+Data from `nov_revenue_breakdown_pie.csv`. Assign colors:
 ```
-Segment    %      Color
-Data      64.2%   #e8335a  (bright crimson)
-Voice     13.0%   #2a1a20  (very dark)
-MFS       11.6%   #4a4a5a  (dark gray)
-Others    11.1%   #5c1028  (dark maroon)
+Data    → #e8335a
+Voice   → #2a1a20
+MFS     → #4a4a5a
+Others  → #5c1028
 ```
-Legend labels (Category % Amount) on the left side of the donut.
+Legend: Category, Pct%, Amount_M on the left of the donut.
 
 **RIGHT — "Inflows / Outflows"**
-Two values displayed with diverging visual (arrow or filled triangle):
-- INFLOWS:  **266,815,869** (white, pointing right/up)
-- OUTFLOWS: **-314,450,676** (red #e8335a, pointing down)
-Label each value at its base.
-
----
-
-## Embedded Data (paste as JS constants in the artifact)
-
-```js
-const NOV = {
-  revenue_m:           251.04,
-  opex_m:              136.21,
-  gross_margin_pct:    75,
-  opex_intensity_pct:  54,
-  ebitda_pct:          21,
-  capex_m:             242.12,   // render red — over budget
-  capex_intensity_pct: 21,       // render red — over budget
-  profit_loss_m:       -97.52,
-  network_avail_pct:   99.01,
-  inflows:             266815869,
-  outflows:           -314450676,
-};
-
-const SUBS = {
-  total_subs:       8503,
-  gross_adds:       284,
-  active_data_subs: 2732,
-  mobile_rgs:       4145,
-  active_cash_subs: 2950,
-  cash_rgs:         2489,
-  fixed_rgs:        63.9,
-  churn_pct:       -1.50,
-};
-
-const PIE = [
-  { label: 'Data',   pct: 64.2, amt_m: 161.17, color: '#e8335a' },
-  { label: 'Voice',  pct: 13.0, amt_m:  32.64, color: '#2a1a20' },
-  { label: 'MFS',    pct: 11.6, amt_m:  29.12, color: '#4a4a5a' },
-  { label: 'Others', pct: 11.1, amt_m:  27.87, color: '#5c1028' },
-];
-```
+Values from `Inflows` and `Outflows` columns of the selected month:
+- INFLOWS: formatted integer with commas, white
+- OUTFLOWS: formatted integer with commas, red (#e8335a)
 
 ---
 
 ## Rules
-- Monetary values use "M" suffix: "251.04M"
-- Inflows/Outflows display with comma formatting: 266,815,869
-- CAPEX (242.12M) and CAPEX Intensity (21%) must render in **#ff3b5c**
-- Month tabs are clickable — non-November tabs show a "No data for this month" placeholder
-- System sans-serif font only (no Google Fonts)
-- Donut chart hole = 70% cutout
+- All `_M` values display with "M" suffix: "251.04M"
+- Inflows/Outflows display as full integers with comma formatting
+- CAPEX_M and CAPEX_Intensity_Pct always render in **#ff3b5c**
+- Month tabs are driven by actual months in the CSV — not hardcoded
+- Clicking a tab reloads all cards with that month's data
+- If a CSV file is missing, show a clear inline error message
+- System sans-serif font only
