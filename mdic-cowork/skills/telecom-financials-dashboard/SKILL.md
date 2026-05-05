@@ -24,11 +24,39 @@ Read the following files from the current working directory (/Users/jaddimachkie
 **`usd_financials_monthly.csv` key columns:**
 `Month`, `Revenue_USD_M`, `COS_USD_M`, `OPEX_USD_M`, `EBITDA_USD_M`, `EBITDA_Margin_Pct`, `USD_GHS_Rate`
 
-Parse both CSVs and embed all aggregated data as JS arrays in the artifact.
-
 ## Step 2 — Generate HTML Artifact
 Generate a **single self-contained HTML artifact** using Chart.js (CDN).
 Two-column layout: GHS on the left, USD on the right.
+
+The artifact must read CSVs live on every open using `window.cowork.callMcpTool` — do NOT hardcode data as JS arrays.
+
+Use this pattern to read each file:
+
+```js
+async function readFile(path) {
+  const res = await window.cowork.callMcpTool('mcp__filesystem__read_file', { path });
+  if (typeof res === 'string') return res;
+  if (Array.isArray(res)) return res.map(r => r.text ?? '').join('');
+  if (res?.content) {
+    const c = res.content;
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) return c.map(r => r.text ?? '').join('');
+  }
+  if (res?.text) return res.text;
+  return String(res);
+}
+```
+
+On `DOMContentLoaded`:
+1. Show a loading spinner
+2. Call `readFile()` for both CSVs in parallel using `Promise.all`
+3. Parse and aggregate the CSV data in-browser using JS
+4. Render all charts and KPIs from the parsed data
+5. Show an error box if either file fails to load
+
+Include a **Refresh** button in the top bar that re-runs the full load cycle.
+
+Register `mcp_tools: ["mcp__filesystem__read_file"]` on the artifact.
 
 ---
 

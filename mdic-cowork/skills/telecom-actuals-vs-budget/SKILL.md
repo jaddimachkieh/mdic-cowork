@@ -25,10 +25,38 @@ From this single file you can derive everything:
 - **Category breakdowns**: group by `Category` + `Type` where `PL_Line` = target line, sum across months
 - **Month filter**: filter rows by `Month` before aggregating
 
-Parse the CSV, compute all aggregations in JS, embed as arrays in the artifact.
-
 ## Step 2 — Generate HTML Artifact
 Generate a **single self-contained HTML artifact** using Chart.js (CDN).
+
+The artifact must read CSVs live on every open using `window.cowork.callMcpTool` — do NOT hardcode data as JS arrays.
+
+Use this pattern to read each file:
+
+```js
+async function readFile(path) {
+  const res = await window.cowork.callMcpTool('mcp__filesystem__read_file', { path });
+  if (typeof res === 'string') return res;
+  if (Array.isArray(res)) return res.map(r => r.text ?? '').join('');
+  if (res?.content) {
+    const c = res.content;
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) return c.map(r => r.text ?? '').join('');
+  }
+  if (res?.text) return res.text;
+  return String(res);
+}
+```
+
+On `DOMContentLoaded`:
+1. Show a loading spinner
+2. Call `readFile()` for both CSVs in parallel using `Promise.all`
+3. Parse and aggregate the CSV data in-browser using JS
+4. Render all charts and KPIs from the parsed data
+5. Show an error box if either file fails to load
+
+Include a **Refresh** button in the top bar that re-runs the full load cycle.
+
+Register `mcp_tools: ["mcp__filesystem__read_file"]` on the artifact.
 
 ---
 

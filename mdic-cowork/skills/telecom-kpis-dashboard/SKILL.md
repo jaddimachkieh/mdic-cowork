@@ -26,10 +26,40 @@ Read the following files from the current working directory (/Users/jaddimachkie
 **`nov_revenue_breakdown_pie.csv` key columns:**
 `Category`, `Pct`, `Amount_M`
 
-Parse all CSVs, embed the data as JS arrays in the artifact, and default to the **latest month** in the data.
+Default to the **latest month** in the data.
 
 ## Step 2 — Generate HTML Artifact
-Generate a **single self-contained HTML artifact** using Chart.js (CDN) with all parsed data embedded inline.
+Generate a **single self-contained HTML artifact** using Chart.js (CDN).
+
+The artifact must read CSVs live on every open using `window.cowork.callMcpTool` — do NOT hardcode data as JS arrays.
+
+Use this pattern to read each file:
+
+```js
+async function readFile(path) {
+  const res = await window.cowork.callMcpTool('mcp__filesystem__read_file', { path });
+  if (typeof res === 'string') return res;
+  if (Array.isArray(res)) return res.map(r => r.text ?? '').join('');
+  if (res?.content) {
+    const c = res.content;
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) return c.map(r => r.text ?? '').join('');
+  }
+  if (res?.text) return res.text;
+  return String(res);
+}
+```
+
+On `DOMContentLoaded`:
+1. Show a loading spinner
+2. Call `readFile()` for all 3 CSVs in parallel using `Promise.all`
+3. Parse and aggregate the CSV data in-browser using JS
+4. Render all cards, charts, and KPIs from the parsed data — default to latest month
+5. Show an error box if any file fails to load
+
+Include a **Refresh** button in the top bar that re-runs the full load cycle.
+
+Register `mcp_tools: ["mcp__filesystem__read_file"]` on the artifact.
 
 ---
 
