@@ -57,8 +57,6 @@ On `DOMContentLoaded`:
 4. Render all cards, charts, and KPIs from the parsed data — default to latest month
 5. Show an error box if any file fails to load
 
-Include a **Refresh** button in the top bar that re-runs the full load cycle.
-
 Register `mcp_tools: ["mcp__filesystem__read_file"]` on the artifact.
 
 ---
