@@ -58,6 +58,20 @@ What would you like to deep dive into?
 
 Wait for the user's selection, then output only that section as a focused analysis block. Use markdown. Always lead with a one-line executive summary.
 
+## Step 4 — Offer Next Steps
+
+After delivering any analysis section, always close with:
+
+```
+---
+**What's next?**
+- Explore another area: [list remaining menu options for this dashboard]
+- 📊 **Benchmark this** — see how these results compare to Competitor A, Industry Average, and Best in Class
+- 📧 **Send to someone** — draft a C-suite email summary
+```
+
+The benchmark and email options appear after every section — they are always available regardless of which dashboard is active.
+
 ---
 
 ## Deep Dive Templates
